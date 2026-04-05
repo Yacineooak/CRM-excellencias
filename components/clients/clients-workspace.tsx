@@ -11,7 +11,6 @@ import { Card } from "@/components/ui/card";
 import { Dialog } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import type { Client, Project } from "@/lib/types";
-import { formatCurrency } from "@/lib/utils";
 
 export function ClientsWorkspace({
   clients,
@@ -149,8 +148,8 @@ export function ClientsWorkspace({
                   <p>{client.notes || "No notes yet."}</p>
                 </div>
                 <div className="mt-5 flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Project value</span>
-                  <span className="font-semibold">{formatCurrency(client.spend)}</span>
+                  <span className="text-muted-foreground">Linked projects</span>
+                  <span className="font-semibold">{client.linkedProjectIds.length}</span>
                 </div>
               </div>
             ))

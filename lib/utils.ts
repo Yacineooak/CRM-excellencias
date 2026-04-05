@@ -24,14 +24,6 @@ export function formatRelativeDay(input: string) {
   return formatDate(input);
 }
 
-export function formatCurrency(value: number) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-  }).format(value);
-}
-
 export function formatRelativeTime(input: string) {
   const date = new Date(input).getTime();
   const now = Date.now();

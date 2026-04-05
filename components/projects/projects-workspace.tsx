@@ -11,7 +11,7 @@ import { Card } from "@/components/ui/card";
 import { Dialog } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 import type { Client, Project, UserProfile } from "@/lib/types";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 
 export function ProjectsWorkspace({
   clients,
@@ -48,7 +48,7 @@ export function ProjectsWorkspace({
           </>
         }
         badge="Portfolio"
-        description="Review delivery health, ownership, budgets, and timelines across all client engagements."
+        description="Review delivery health, ownership, timelines, and assigned teams across all client engagements."
         eyebrow="Projects"
         title="Project delivery with visibility built in"
       />
@@ -123,8 +123,8 @@ export function ProjectsWorkspace({
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">Budget</p>
-                    <p className="mt-2 font-semibold">{formatCurrency(project.budget)}</p>
+                    <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">Team size</p>
+                    <p className="mt-2 font-semibold">{team.length} members</p>
                   </div>
                   <div className="flex -space-x-3">
                     {team.map((member) => (

@@ -69,14 +69,14 @@ A premium Next.js App Router SaaS scaffold for creative agencies. The product co
 
 ### Dashboard
 
-- Hero overview with KPI cards, team availability, revenue snapshot, and active sprint context
+- Hero overview with KPI cards, team availability, assignment visibility, and active sprint context
 - Charts for throughput and workload distribution
 - Personal task queue, upcoming deadlines, and live activity feed
 
 ### CRM
 
 - Searchable client list with status filters
-- Rich client profile cards with spend, contact info, notes, linked projects, and account history
+- Rich client profile cards with contact info, notes, linked projects, and account history
 - Built-in empty states and premium card layouts for lead nurturing
 
 ### Projects

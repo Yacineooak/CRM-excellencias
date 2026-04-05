@@ -58,7 +58,6 @@ export function CreateProjectForm({
       description: String(formData.get("description") ?? "").trim() || null,
       status: String(formData.get("status") ?? "planning") as ProjectStatus,
       deadline: String(formData.get("deadline") ?? "").trim() || null,
-      budget: Number(formData.get("budget") ?? 0),
       progress: Number(formData.get("progress") ?? 0),
       owner_id: currentUserId,
     };
@@ -117,7 +116,7 @@ export function CreateProjectForm({
           </Select>
         </div>
       </div>
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">
           <label className="text-sm font-medium">Status</label>
           <Select defaultValue="planning" name="status">
@@ -130,10 +129,6 @@ export function CreateProjectForm({
         <div className="space-y-2">
           <label className="text-sm font-medium">Deadline</label>
           <Input name="deadline" type="date" />
-        </div>
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Budget (USD)</label>
-          <Input min="0" name="budget" placeholder="12000" type="number" />
         </div>
       </div>
       <div className="space-y-2">

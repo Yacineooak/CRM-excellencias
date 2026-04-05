@@ -4,14 +4,14 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center rounded-full text-sm font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center rounded-full text-sm font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 active:scale-[0.99]",
   {
     variants: {
       variant: {
         default:
-          "bg-teal text-white shadow-teal hover:-translate-y-0.5 hover:bg-teal-600",
+          "bg-[linear-gradient(135deg,#4ab5b8,#2c9598)] text-white shadow-[0_18px_40px_rgba(74,181,184,0.3)] hover:-translate-y-0.5 hover:shadow-[0_22px_48px_rgba(74,181,184,0.4)]",
         secondary:
-          "glass-panel hover:-translate-y-0.5 hover:border-teal/30 hover:text-teal",
+          "border border-white/25 bg-[linear-gradient(180deg,rgba(255,255,255,0.88),rgba(247,252,252,0.7))] text-foreground shadow-[0_14px_34px_rgba(9,23,24,0.08)] hover:-translate-y-0.5 hover:border-teal/30 hover:text-teal dark:bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.04))]",
         ghost:
           "bg-transparent text-foreground hover:bg-foreground/5 dark:hover:bg-white/5",
         destructive:
@@ -19,7 +19,7 @@ const buttonVariants = cva(
       },
       size: {
         default: "h-11 px-5",
-        sm: "h-9 px-4",
+        sm: "h-10 px-4",
         lg: "h-12 px-6 text-base",
         icon: "size-10 rounded-full",
       },

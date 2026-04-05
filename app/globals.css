@@ -42,8 +42,9 @@
   body {
     @apply bg-background text-foreground antialiased transition-colors duration-500;
     background-image:
-      radial-gradient(circle at top left, rgba(74, 181, 184, 0.14), transparent 26%),
-      radial-gradient(circle at 86% 14%, rgba(255, 255, 255, 0.16), transparent 22%),
+      radial-gradient(circle at top left, rgba(74, 181, 184, 0.18), transparent 26%),
+      radial-gradient(circle at 86% 14%, rgba(255, 255, 255, 0.18), transparent 22%),
+      radial-gradient(circle at 18% 80%, rgba(74, 181, 184, 0.1), transparent 20%),
       linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 60%);
     font-family: var(--font-sans), sans-serif;
     min-height: 100vh;
@@ -84,4 +85,10 @@
   background-size: 90px 90px;
   mask-image: radial-gradient(circle at center, black 30%, transparent 86%);
   opacity: 0.55;
+}
+
+.mesh-panel {
+  background:
+    radial-gradient(circle at top left, rgba(74, 181, 184, 0.2), transparent 30%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
 }

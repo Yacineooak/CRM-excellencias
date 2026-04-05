@@ -35,7 +35,6 @@ export type Client = {
   notes: string;
   industry: string;
   ownerId: string | null;
-  spend: number;
   createdAt: string;
 };
 
@@ -89,11 +88,13 @@ export type NotificationItem = {
 };
 
 export type DashboardStats = {
-  activeRevenue: number;
+  activeClients: number;
   activeProjects: number;
   tasksCompleted: number;
-  teamCapacity: number;
+  teamMembers: number;
   atRiskProjects: number;
+  overdueTasks: number;
+  assignedTasks: number;
 };
 
 export type ThroughputPoint = {

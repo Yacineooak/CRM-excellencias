@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PageHeader } from "@/components/shared/page-header";
 import type { WorkspaceSnapshot } from "@/lib/types";
-import { formatCurrency, formatRelativeDay } from "@/lib/utils";
+import { formatRelativeDay } from "@/lib/utils";
 
 const statIcons = [ArrowUpRight, BriefcaseBusiness, CheckCircle2, Users2];
 
@@ -21,24 +21,24 @@ export function DashboardWorkspace({ snapshot }: { snapshot: WorkspaceSnapshot }
   const stats = useMemo(
     () => [
       {
-        label: "Active revenue",
-        value: formatCurrency(snapshot.stats.activeRevenue),
-        change: `${snapshot.stats.activeProjects} open projects`,
+        label: "Active clients",
+        value: String(snapshot.stats.activeClients),
+        change: `${snapshot.stats.atRiskProjects} projects at risk`,
       },
       {
-        label: "Projects at risk",
-        value: String(snapshot.stats.atRiskProjects),
-        change: "Needs attention",
+        label: "Active projects",
+        value: String(snapshot.stats.activeProjects),
+        change: `${snapshot.stats.assignedTasks} tasks assigned`,
       },
       {
         label: "Tasks completed",
         value: String(snapshot.stats.tasksCompleted),
-        change: "Across all projects",
+        change: `${snapshot.stats.overdueTasks} overdue`,
       },
       {
-        label: "Team capacity",
-        value: `${snapshot.stats.teamCapacity}%`,
-        change: "Based on active task load",
+        label: "Team members",
+        value: String(snapshot.stats.teamMembers),
+        change: "Role-based dispatch ready",
       },
     ],
     [snapshot.stats],
@@ -74,7 +74,7 @@ export function DashboardWorkspace({ snapshot }: { snapshot: WorkspaceSnapshot }
           </>
         }
         badge="Live workspace"
-        description="Track agency delivery, active clients, deadlines, and team velocity from one elegant command surface."
+        description="Track delivery health, active clients, deadlines, assignments, and team momentum from one elegant command surface."
         eyebrow="Dashboard"
         title="Creative operations, without the chaos"
       />

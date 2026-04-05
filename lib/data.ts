@@ -175,30 +175,24 @@ function buildFocus(tasks: DbTask[]): FocusPoint[] {
 }
 
 function buildStats(projects: DbProject[], tasks: DbTask[], users: DbUser[]): DashboardStats {
+  const activeClients = new Set(
+    projects.filter((project) => project.status === "active").map((project) => project.client_id),
+  ).size;
   const activeProjects = projects.filter((project) => project.status === "active").length;
-  const activeRevenue = projects
-    .filter((project) => project.status === "active")
-    .reduce((sum, project) => sum + Number(project.budget ?? 0), 0);
   const tasksCompleted = tasks.filter((task) => task.status === "done").length;
-  const teamCapacity =
-    users.length > 0
-      ? Math.min(
-          100,
-          Math.round(
-            (tasks.filter((task) => task.status === "in_progress" || task.status === "review")
-              .length /
-              Math.max(users.length, 1)) *
-              20,
-          ),
-        )
-      : 0;
+  const overdueTasks = tasks.filter(
+    (task) => task.due_date && new Date(task.due_date).getTime() < Date.now() && task.status !== "done",
+  ).length;
+  const assignedTasks = tasks.filter((task) => Boolean(task.assignee_id)).length;
 
   return {
-    activeRevenue,
+    activeClients,
     activeProjects,
     tasksCompleted,
-    teamCapacity,
+    teamMembers: users.length,
     atRiskProjects: projects.filter((project) => project.status === "at_risk").length,
+    overdueTasks,
+    assignedTasks,
   };
 }
 
@@ -307,7 +301,6 @@ export async function getWorkspaceSnapshot(): Promise<WorkspaceSnapshot | null> 
       notes: client.notes ?? "",
       industry: client.industry ?? "Creative services",
       ownerId: client.owner_id,
-      spend: clientProjects.reduce((sum, project) => sum + Number(project.budget ?? 0), 0),
       createdAt: client.created_at,
     };
   });

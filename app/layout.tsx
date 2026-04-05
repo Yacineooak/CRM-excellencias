@@ -16,8 +16,13 @@ const grotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "AgencyOS | Creative CRM and Project Management",
-  description: "Premium CRM and project management workspace for creative agencies.",
+  title: "AgencyOS | Creative Agency Project Management",
+  description: "Premium project management and team dispatch workspace for creative agencies.",
+  icons: {
+    icon: "https://i.imgur.com/pFlN7HD.png",
+    shortcut: "https://i.imgur.com/pFlN7HD.png",
+    apple: "https://i.imgur.com/pFlN7HD.png",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
