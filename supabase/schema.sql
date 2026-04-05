@@ -1,11 +1,46 @@
 create extension if not exists "pgcrypto";
 
-create type public.user_role as enum ('admin', 'manager', 'team_member');
-create type public.client_status as enum ('lead', 'active', 'inactive');
-create type public.project_status as enum ('planning', 'active', 'at_risk', 'completed');
-create type public.task_status as enum ('todo', 'in_progress', 'review', 'done');
-create type public.task_priority as enum ('low', 'medium', 'high', 'urgent');
-create type public.notification_kind as enum ('mention', 'task', 'project');
+do $$
+begin
+  if not exists (select 1 from pg_type where typname = 'user_role') then
+    create type public.user_role as enum ('admin', 'manager', 'team_member');
+  end if;
+end $$;
+
+do $$
+begin
+  if not exists (select 1 from pg_type where typname = 'client_status') then
+    create type public.client_status as enum ('lead', 'active', 'inactive');
+  end if;
+end $$;
+
+do $$
+begin
+  if not exists (select 1 from pg_type where typname = 'project_status') then
+    create type public.project_status as enum ('planning', 'active', 'at_risk', 'completed');
+  end if;
+end $$;
+
+do $$
+begin
+  if not exists (select 1 from pg_type where typname = 'task_status') then
+    create type public.task_status as enum ('todo', 'in_progress', 'review', 'done');
+  end if;
+end $$;
+
+do $$
+begin
+  if not exists (select 1 from pg_type where typname = 'task_priority') then
+    create type public.task_priority as enum ('low', 'medium', 'high', 'urgent');
+  end if;
+end $$;
+
+do $$
+begin
+  if not exists (select 1 from pg_type where typname = 'notification_kind') then
+    create type public.notification_kind as enum ('mention', 'task', 'project');
+  end if;
+end $$;
 
 create or replace function public.set_updated_at()
 returns trigger
