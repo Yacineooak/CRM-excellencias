@@ -221,6 +221,7 @@ alter table public.comments enable row level security;
 alter table public.activity_logs enable row level security;
 alter table public.notifications enable row level security;
 
+drop policy if exists "users can view profiles" on public.users;
 create policy "users can view profiles"
 on public.users
 for select
@@ -258,12 +259,14 @@ for insert
 to authenticated
 with check (auth.uid() = id);
 
+drop policy if exists "authenticated users can view clients" on public.clients;
 create policy "authenticated users can view clients"
 on public.clients
 for select
 to authenticated
 using (true);
 
+drop policy if exists "managers and admins manage clients" on public.clients;
 create policy "managers and admins manage clients"
 on public.clients
 for all
@@ -285,6 +288,7 @@ with check (
   )
 );
 
+drop policy if exists "authenticated users can view projects" on public.projects;
 create policy "authenticated users can view projects"
 on public.projects
 for select
@@ -313,6 +317,7 @@ with check (
   )
 );
 
+drop policy if exists "authenticated users can view project members" on public.project_members;
 create policy "authenticated users can view project members"
 on public.project_members
 for select
@@ -341,12 +346,14 @@ with check (
   )
 );
 
+drop policy if exists "team can view tasks" on public.tasks;
 create policy "team can view tasks"
 on public.tasks
 for select
 to authenticated
 using (true);
 
+drop policy if exists "team can manage tasks on assigned projects" on public.tasks;
 create policy "team can manage tasks on assigned projects"
 on public.tasks
 for all
@@ -380,24 +387,28 @@ with check (
   )
 );
 
+drop policy if exists "team can view comments" on public.comments;
 create policy "team can view comments"
 on public.comments
 for select
 to authenticated
 using (true);
 
+drop policy if exists "team can insert comments" on public.comments;
 create policy "team can insert comments"
 on public.comments
 for insert
 to authenticated
 with check (auth.uid() = author_id);
 
+drop policy if exists "users can view own notifications" on public.notifications;
 create policy "users can view own notifications"
 on public.notifications
 for select
 to authenticated
 using (auth.uid() = user_id);
 
+drop policy if exists "users can update own notifications" on public.notifications;
 create policy "users can update own notifications"
 on public.notifications
 for update
