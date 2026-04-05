@@ -416,6 +416,7 @@ to authenticated
 using (auth.uid() = user_id);
 
 drop policy if exists "admins can view activity logs" on public.activity_logs;
+drop policy if exists "users can view relevant activity logs" on public.activity_logs;
 create policy "users can view relevant activity logs"
 on public.activity_logs
 for select
