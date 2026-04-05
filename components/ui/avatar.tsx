@@ -1,6 +1,9 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Image from "next/image";
 
-import { cn } from "@/lib/utils";
+import { cn, getInitials } from "@/lib/utils";
 
 export function Avatar({
   src,
@@ -11,14 +14,33 @@ export function Avatar({
   alt: string;
   className?: string;
 }) {
+  const [imageError, setImageError] = useState(false);
+
+  useEffect(() => {
+    setImageError(false);
+  }, [src]);
+
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-full border border-white/30 bg-white/60 shadow-soft dark:border-white/10 dark:bg-white/10",
+        "relative overflow-hidden rounded-full border border-white/30 bg-[radial-gradient(circle_at_30%_30%,rgba(255,194,244,0.95),rgba(74,181,184,0.72))] shadow-soft dark:border-white/10",
         className,
       )}
     >
-      <Image alt={alt} className="h-full w-full object-cover" fill sizes="80px" src={src} />
+      {src && !imageError ? (
+        <Image
+          alt={alt}
+          className="h-full w-full object-cover"
+          fill
+          onError={() => setImageError(true)}
+          sizes="80px"
+          src={src}
+        />
+      ) : (
+        <div className="flex h-full w-full items-center justify-center text-sm font-semibold text-white/95">
+          {getInitials(alt || "User")}
+        </div>
+      )}
     </div>
   );
 }

@@ -112,6 +112,10 @@ create table if not exists public.notifications (
   created_at timestamptz not null default timezone('utc', now())
 );
 
+insert into storage.buckets (id, name, public)
+values ('avatars', 'avatars', true)
+on conflict (id) do nothing;
+
 create index if not exists idx_clients_owner_id on public.clients(owner_id);
 create index if not exists idx_clients_status on public.clients(status);
 create index if not exists idx_projects_client_id on public.projects(client_id);
@@ -393,3 +397,44 @@ on public.notifications
 for insert
 to authenticated
 with check (auth.uid() is not null);
+
+drop policy if exists "Avatar images are publicly accessible" on storage.objects;
+create policy "Avatar images are publicly accessible"
+on storage.objects
+for select
+to public
+using (bucket_id = 'avatars');
+
+drop policy if exists "Authenticated users can upload avatars" on storage.objects;
+create policy "Authenticated users can upload avatars"
+on storage.objects
+for insert
+to authenticated
+with check (
+  bucket_id = 'avatars'
+  and (storage.foldername(name))[1] = auth.uid()::text
+);
+
+drop policy if exists "Users can update own avatars" on storage.objects;
+create policy "Users can update own avatars"
+on storage.objects
+for update
+to authenticated
+using (
+  bucket_id = 'avatars'
+  and (storage.foldername(name))[1] = auth.uid()::text
+)
+with check (
+  bucket_id = 'avatars'
+  and (storage.foldername(name))[1] = auth.uid()::text
+);
+
+drop policy if exists "Users can delete own avatars" on storage.objects;
+create policy "Users can delete own avatars"
+on storage.objects
+for delete
+to authenticated
+using (
+  bucket_id = 'avatars'
+  and (storage.foldername(name))[1] = auth.uid()::text
+);

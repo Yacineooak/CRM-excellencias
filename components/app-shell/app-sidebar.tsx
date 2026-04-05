@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  Activity,
   BriefcaseBusiness,
   Building2,
   LayoutDashboard,
@@ -29,7 +30,7 @@ export function AppSidebar({
   viewer,
   taskCount,
 }: {
-  viewer: UserProfile;
+    viewer: UserProfile;
   taskCount: number;
 }) {
   const pathname = usePathname();
@@ -48,7 +49,7 @@ export function AppSidebar({
         </div>
       </div>
 
-      <div className="mt-10 space-y-2">
+      <div className="mt-10 flex-1 space-y-2 overflow-y-auto pr-1">
         {navigation.map((item) => {
           const isActive = pathname === item.href;
           const Icon = item.icon;
@@ -83,12 +84,22 @@ export function AppSidebar({
         })}
       </div>
 
-      <div className="mt-auto rounded-[30px] border border-white/20 bg-background/60 p-5 dark:bg-background/40">
-        <p className="text-xs uppercase tracking-[0.32em] text-muted-foreground">{formatLabel(viewer.role)}</p>
-        <h3 className="mt-3 text-xl font-semibold">{taskCount} active tasks in view</h3>
-        <p className="mt-2 text-sm leading-6 text-muted-foreground">
-          Signed in as {viewer.name}. Your workspace now reads directly from Supabase.
-        </p>
+      <div className="mt-4 rounded-[30px] border border-white/20 bg-background/60 p-4 dark:bg-background/40">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-xs uppercase tracking-[0.32em] text-muted-foreground">{formatLabel(viewer.role)}</p>
+            <h3 className="mt-2 text-lg font-semibold">{taskCount} active tasks</h3>
+          </div>
+          <div className="rounded-full bg-teal/12 p-2 text-teal">
+            <Activity className="size-4" />
+          </div>
+        </div>
+        <div className="mt-4 rounded-[22px] border border-white/15 bg-background/45 px-3 py-3 dark:border-white/10">
+          <p className="truncate text-sm font-semibold">{viewer.name}</p>
+          <p className="mt-1 text-xs uppercase tracking-[0.18em] text-muted-foreground">
+            Live from Supabase
+          </p>
+        </div>
       </div>
     </aside>
   );

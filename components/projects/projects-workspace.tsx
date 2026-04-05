@@ -67,13 +67,14 @@ export function ProjectsWorkspace({
             <p className="text-sm text-muted-foreground">Portfolio focus</p>
             <h3 className="mt-2 text-2xl font-semibold">Track delivery by status and team load</h3>
           </div>
-          <div className="grid gap-3 sm:grid-cols-2 lg:w-[420px]">
+          <div className="grid gap-3 sm:grid-cols-[minmax(240px,1fr)_140px] lg:w-[460px]">
             <Select
+              className="min-w-[240px]"
               icon={<BriefcaseBusiness className="size-3.5" />}
               onChange={(event) => setStatusFilter(event.target.value)}
               value={statusFilter}
             >
-              <option value="all">All project statuses</option>
+              <option value="all">All statuses</option>
               <option value="planning">Planning</option>
               <option value="active">Active</option>
               <option value="at_risk">At risk</option>

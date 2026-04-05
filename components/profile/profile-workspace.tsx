@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Camera, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -14,6 +14,7 @@ import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import type { ActivityItem, UserProfile } from "@/lib/types";
+import { formatLabel } from "@/lib/utils";
 
 export function ProfileWorkspace({
   activity,
@@ -29,8 +30,17 @@ export function ProfileWorkspace({
   const [availability, setAvailability] = useState(viewer.availability);
   const [avatarUrl, setAvatarUrl] = useState(viewer.avatarUrl);
   const [file, setFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!previewUrl) {
+      return;
+    }
+
+    return () => URL.revokeObjectURL(previewUrl);
+  }, [previewUrl]);
 
   async function saveProfile() {
     const supabase = getSupabaseBrowserClient();
@@ -45,12 +55,24 @@ export function ProfileWorkspace({
     let nextAvatarUrl = avatarUrl;
 
     if (file) {
-      const path = `${viewer.id}/${Date.now()}-${file.name}`;
-      const upload = await supabase.storage.from("avatars").upload(path, file, { upsert: true });
-      if (!upload.error) {
-        nextAvatarUrl = supabase.storage.from("avatars").getPublicUrl(path).data.publicUrl;
-        setAvatarUrl(nextAvatarUrl);
+      const extension = file.name.split(".").pop() ?? "png";
+      const path = `${viewer.id}/avatar-${Date.now()}.${extension}`;
+      const upload = await supabase.storage.from("avatars").upload(path, file, {
+        cacheControl: "3600",
+        contentType: file.type || "image/png",
+        upsert: true,
+      });
+
+      if (upload.error) {
+        setError(
+          `Avatar upload failed: ${upload.error.message}. Make sure the 'avatars' bucket exists and allows authenticated uploads.`,
+        );
+        setLoading(false);
+        return;
       }
+
+      nextAvatarUrl = supabase.storage.from("avatars").getPublicUrl(path).data.publicUrl;
+      setAvatarUrl(nextAvatarUrl);
     }
 
     const { error: updateError } = await supabase
@@ -78,6 +100,8 @@ export function ProfileWorkspace({
     });
 
     router.refresh();
+    setFile(null);
+    setPreviewUrl(null);
     setLoading(false);
   }
 
@@ -117,7 +141,7 @@ export function ProfileWorkspace({
       <Card className="p-6">
         <div className="flex flex-wrap items-start gap-5">
           <div className="relative">
-            <Avatar alt={name} className="size-24" src={avatarUrl} />
+            <Avatar alt={name} className="size-24" src={previewUrl ?? avatarUrl} />
             <button
               className="absolute bottom-0 right-0 rounded-full bg-teal p-2 text-white shadow-teal"
               onClick={() => fileInputRef.current?.click()}
@@ -129,17 +153,24 @@ export function ProfileWorkspace({
               ref={fileInputRef}
               accept="image/*"
               className="hidden"
-              onChange={(event) => setFile(event.target.files?.[0] ?? null)}
+              onChange={(event) => {
+                const nextFile = event.target.files?.[0] ?? null;
+                setFile(nextFile);
+                setPreviewUrl(nextFile ? URL.createObjectURL(nextFile) : null);
+              }}
               type="file"
             />
           </div>
           <div className="space-y-2">
             <div className="flex items-center gap-3">
               <h3 className="text-2xl font-semibold">{name}</h3>
-              <Badge>{viewer.role.replace("_", " ")}</Badge>
+              <Badge>{formatLabel(viewer.role)}</Badge>
             </div>
             <p className="text-sm text-muted-foreground">{title}</p>
             <p className="text-sm text-muted-foreground">{availability}</p>
+            {file ? (
+              <p className="text-xs uppercase tracking-[0.18em] text-teal">New avatar ready to save</p>
+            ) : null}
           </div>
         </div>
 

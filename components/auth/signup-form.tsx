@@ -68,15 +68,24 @@ export function SignupForm() {
     let avatarUrl = generatedAvatar;
 
     if (file && data.user) {
-      const filePath = `${data.user.id}/${Date.now()}-${file.name}`;
+      const extension = file.name.split(".").pop() ?? "png";
+      const filePath = `${data.user.id}/avatar-${Date.now()}.${extension}`;
       const upload = await supabase.storage.from("avatars").upload(filePath, file, {
+        cacheControl: "3600",
+        contentType: file.type || "image/png",
         upsert: true,
       });
 
-      if (!upload.error) {
-        const publicUrl = supabase.storage.from("avatars").getPublicUrl(filePath);
-        avatarUrl = publicUrl.data.publicUrl;
+      if (upload.error) {
+        setError(
+          `Account created, but avatar upload failed: ${upload.error.message}. Make sure the 'avatars' bucket exists and allows authenticated uploads.`,
+        );
+        setLoading(false);
+        return;
       }
+
+      const publicUrl = supabase.storage.from("avatars").getPublicUrl(filePath);
+      avatarUrl = publicUrl.data.publicUrl;
     }
 
     if (data.user) {
