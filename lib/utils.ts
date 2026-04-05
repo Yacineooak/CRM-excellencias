@@ -23,3 +23,26 @@ export function formatRelativeDay(input: string) {
   if (diff < 7) return `In ${diff} days`;
   return formatDate(input);
 }
+
+export function formatCurrency(value: number) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
+export function formatRelativeTime(input: string) {
+  const date = new Date(input).getTime();
+  const now = Date.now();
+  const diffSeconds = Math.round((date - now) / 1000);
+  const absSeconds = Math.abs(diffSeconds);
+  const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
+
+  if (absSeconds < 60) return rtf.format(diffSeconds, "second");
+  if (absSeconds < 3600) return rtf.format(Math.round(diffSeconds / 60), "minute");
+  if (absSeconds < 86400) return rtf.format(Math.round(diffSeconds / 3600), "hour");
+  if (absSeconds < 604800) return rtf.format(Math.round(diffSeconds / 86400), "day");
+
+  return formatDate(input);
+}

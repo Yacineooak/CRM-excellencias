@@ -10,8 +10,8 @@ import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export function LoginForm() {
   const router = useRouter();
-  const [email, setEmail] = useState("lina@aether.studio");
-  const [password, setPassword] = useState("creative-agency");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -46,12 +46,18 @@ export function LoginForm() {
     <form className="space-y-5" onSubmit={handleSubmit}>
       <div className="space-y-2">
         <label className="text-sm font-medium">Email</label>
-        <Input onChange={(event) => setEmail(event.target.value)} value={email} />
+        <Input
+          onChange={(event) => setEmail(event.target.value)}
+          placeholder="you@agency.com"
+          type="email"
+          value={email}
+        />
       </div>
       <div className="space-y-2">
         <label className="text-sm font-medium">Password</label>
         <Input
           onChange={(event) => setPassword(event.target.value)}
+          placeholder="Enter your password"
           type="password"
           value={password}
         />

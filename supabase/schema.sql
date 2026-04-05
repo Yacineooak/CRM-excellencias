@@ -187,11 +187,36 @@ for select
 to authenticated
 using (true);
 
+drop policy if exists "users can update own profile" on public.users;
 create policy "users can update own profile"
 on public.users
 for update
 to authenticated
-using (auth.uid() = id);
+using (
+  auth.uid() = id
+  or exists (
+    select 1
+    from public.users u
+    where u.id = auth.uid()
+      and u.role = 'admin'
+  )
+)
+with check (
+  auth.uid() = id
+  or exists (
+    select 1
+    from public.users u
+    where u.id = auth.uid()
+      and u.role = 'admin'
+  )
+);
+
+drop policy if exists "users can insert own profile" on public.users;
+create policy "users can insert own profile"
+on public.users
+for insert
+to authenticated
+with check (auth.uid() = id);
 
 create policy "authenticated users can view clients"
 on public.clients
@@ -226,11 +251,55 @@ for select
 to authenticated
 using (true);
 
+drop policy if exists "managers and admins manage projects" on public.projects;
+create policy "managers and admins manage projects"
+on public.projects
+for all
+to authenticated
+using (
+  exists (
+    select 1
+    from public.users u
+    where u.id = auth.uid()
+      and u.role in ('admin', 'manager')
+  )
+)
+with check (
+  exists (
+    select 1
+    from public.users u
+    where u.id = auth.uid()
+      and u.role in ('admin', 'manager')
+  )
+);
+
 create policy "authenticated users can view project members"
 on public.project_members
 for select
 to authenticated
 using (true);
+
+drop policy if exists "managers and admins manage project members" on public.project_members;
+create policy "managers and admins manage project members"
+on public.project_members
+for all
+to authenticated
+using (
+  exists (
+    select 1
+    from public.users u
+    where u.id = auth.uid()
+      and u.role in ('admin', 'manager')
+  )
+)
+with check (
+  exists (
+    select 1
+    from public.users u
+    where u.id = auth.uid()
+      and u.role in ('admin', 'manager')
+  )
+);
 
 create policy "team can view tasks"
 on public.tasks
@@ -295,15 +364,31 @@ for update
 to authenticated
 using (auth.uid() = user_id);
 
-create policy "admins can view activity logs"
+drop policy if exists "admins can view activity logs" on public.activity_logs;
+create policy "users can view relevant activity logs"
 on public.activity_logs
 for select
 to authenticated
 using (
-  exists (
+  actor_id = auth.uid()
+  or exists (
     select 1
     from public.users u
     where u.id = auth.uid()
       and u.role = 'admin'
   )
 );
+
+drop policy if exists "users can insert own activity logs" on public.activity_logs;
+create policy "users can insert own activity logs"
+on public.activity_logs
+for insert
+to authenticated
+with check (actor_id = auth.uid());
+
+drop policy if exists "authenticated users can insert notifications" on public.notifications;
+create policy "authenticated users can insert notifications"
+on public.notifications
+for insert
+to authenticated
+with check (auth.uid() is not null);

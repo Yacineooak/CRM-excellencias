@@ -13,10 +13,10 @@ import type { Role } from "@/lib/types";
 
 export function SignupForm() {
   const router = useRouter();
-  const [name, setName] = useState("Avery Cole");
-  const [email, setEmail] = useState("avery@agency.studio");
-  const [password, setPassword] = useState("premium-workspace");
-  const [role, setRole] = useState<Role>("manager");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState<Role>("team_member");
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -52,6 +52,14 @@ export function SignupForm() {
 
     if (signUpError) {
       setError(signUpError.message);
+      setLoading(false);
+      return;
+    }
+
+    if (!data.session) {
+      setError(
+        "Signup succeeded, but email confirmation is still enabled in Supabase. Disable Email Confirmations in Supabase Authentication settings to allow instant access.",
+      );
       setLoading(false);
       return;
     }
@@ -100,16 +108,22 @@ export function SignupForm() {
       </div>
       <div className="space-y-2">
         <label className="text-sm font-medium">Full name</label>
-        <Input onChange={(event) => setName(event.target.value)} value={name} />
+        <Input onChange={(event) => setName(event.target.value)} placeholder="Avery Cole" value={name} />
       </div>
       <div className="space-y-2">
         <label className="text-sm font-medium">Email</label>
-        <Input onChange={(event) => setEmail(event.target.value)} value={email} />
+        <Input
+          onChange={(event) => setEmail(event.target.value)}
+          placeholder="avery@agency.com"
+          type="email"
+          value={email}
+        />
       </div>
       <div className="space-y-2">
         <label className="text-sm font-medium">Password</label>
         <Input
           onChange={(event) => setPassword(event.target.value)}
+          placeholder="Create a secure password"
           type="password"
           value={password}
         />

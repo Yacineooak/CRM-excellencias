@@ -1,25 +1,16 @@
-import { ProjectGrid } from "@/components/projects/project-grid";
-import { ProjectHealth } from "@/components/projects/project-health";
-import { PageHeader } from "@/components/shared/page-header";
-import { Button } from "@/components/ui/button";
+import { ProjectsWorkspace } from "@/components/projects/projects-workspace";
+import { getWorkspaceSnapshot } from "@/lib/data";
 
-export default function ProjectsPage() {
+export default async function ProjectsPage() {
+  const snapshot = await getWorkspaceSnapshot();
+  if (!snapshot) return null;
+
   return (
-    <>
-      <PageHeader
-        actions={
-          <>
-            <Button variant="secondary">View calendar</Button>
-            <Button>Create project</Button>
-          </>
-        }
-        badge="Portfolio"
-        description="Review delivery health, ownership, budgets, and timelines across all client engagements."
-        eyebrow="Projects"
-        title="Project delivery with visibility built in"
-      />
-      <ProjectGrid />
-      <ProjectHealth />
-    </>
+    <ProjectsWorkspace
+      clients={snapshot.clients}
+      currentUserId={snapshot.viewer.id}
+      projects={snapshot.projects}
+      users={snapshot.users}
+    />
   );
 }

@@ -1,12 +1,17 @@
-import type { HTMLAttributes } from "react";
+import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
-export function Card({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
-  return (
-    <div
-      className={cn("glass-panel soft-outline rounded-[28px] p-5", className)}
-      {...props}
-    />
-  );
-}
+export const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => {
+    return (
+      <div
+        className={cn("glass-panel soft-outline rounded-[28px] p-5", className)}
+        ref={ref}
+        {...props}
+      />
+    );
+  },
+);
+
+Card.displayName = "Card";

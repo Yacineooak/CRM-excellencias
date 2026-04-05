@@ -13,6 +13,7 @@ import {
 
 import { BrandLogo } from "@/components/brand/logo";
 import { Badge } from "@/components/ui/badge";
+import type { UserProfile } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 const navigation = [
@@ -24,7 +25,13 @@ const navigation = [
   { href: "/profile", label: "Profile", icon: UserCircle2 },
 ];
 
-export function AppSidebar() {
+export function AppSidebar({
+  viewer,
+  taskCount,
+}: {
+  viewer: UserProfile;
+  taskCount: number;
+}) {
   const pathname = usePathname();
 
   return (
@@ -60,10 +67,10 @@ export function AppSidebar() {
       </div>
 
       <div className="mt-auto rounded-[28px] border border-white/20 bg-background/60 p-4 dark:bg-background/40">
-        <p className="text-xs uppercase tracking-[0.32em] text-muted-foreground">Launch pulse</p>
-        <h3 className="mt-3 text-xl font-semibold">14 tasks this week</h3>
+        <p className="text-xs uppercase tracking-[0.32em] text-muted-foreground">{viewer.role}</p>
+        <h3 className="mt-3 text-xl font-semibold">{taskCount} active tasks in view</h3>
         <p className="mt-2 text-sm leading-6 text-muted-foreground">
-          Stay ahead of client feedback with the live admin and notification stack.
+          Signed in as {viewer.name}. Your workspace now reads directly from Supabase.
         </p>
       </div>
     </aside>

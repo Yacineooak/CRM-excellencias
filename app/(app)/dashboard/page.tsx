@@ -1,31 +1,9 @@
-import { ActivityFeed } from "@/components/dashboard/activity-feed";
-import { DashboardChart } from "@/components/dashboard/dashboard-chart";
-import { PersonalQueue } from "@/components/dashboard/personal-queue";
-import { StatsGrid } from "@/components/dashboard/stats-grid";
-import { PageHeader } from "@/components/shared/page-header";
-import { Button } from "@/components/ui/button";
+import { DashboardWorkspace } from "@/components/dashboard/dashboard-workspace";
+import { getWorkspaceSnapshot } from "@/lib/data";
 
-export default function DashboardPage() {
-  return (
-    <>
-      <PageHeader
-        actions={
-          <>
-            <Button variant="secondary">Export report</Button>
-            <Button>New project</Button>
-          </>
-        }
-        badge="Live workspace"
-        description="Track agency delivery, active clients, deadlines, and team velocity from one elegant command surface."
-        eyebrow="Dashboard"
-        title="Creative operations, without the chaos"
-      />
-      <StatsGrid />
-      <DashboardChart />
-      <div className="grid gap-4 2xl:grid-cols-2">
-        <PersonalQueue />
-        <ActivityFeed />
-      </div>
-    </>
-  );
+export default async function DashboardPage() {
+  const snapshot = await getWorkspaceSnapshot();
+  if (!snapshot) return null;
+
+  return <DashboardWorkspace snapshot={snapshot} />;
 }

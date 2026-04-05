@@ -1,14 +1,15 @@
 "use client";
 
+import Link from "next/link";
 import { Search } from "lucide-react";
 
 import { ThemeToggle } from "@/components/brand/theme-toggle";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { currentUser } from "@/lib/mock-data";
 import { useUiStore } from "@/store/ui-store";
+import type { UserProfile } from "@/lib/types";
 
-export function Topbar() {
+export function Topbar({ viewer }: { viewer: UserProfile }) {
   const { setCommandPaletteOpen } = useUiStore();
 
   return (
@@ -30,13 +31,16 @@ export function Topbar() {
           <Search className="size-4" />
         </Button>
         <ThemeToggle />
-        <div className="flex items-center gap-3 rounded-full border border-white/20 px-2 py-1.5 dark:border-white/10">
-          <Avatar alt={currentUser.name} className="size-10" src={currentUser.avatarUrl} />
+        <Link
+          className="flex items-center gap-3 rounded-full border border-white/20 px-2 py-1.5 transition hover:bg-foreground/5 dark:border-white/10 dark:hover:bg-white/5"
+          href="/profile"
+        >
+          <Avatar alt={viewer.name} className="size-10" src={viewer.avatarUrl} />
           <div className="hidden pr-2 sm:block">
-            <p className="text-sm font-semibold">{currentUser.name}</p>
-            <p className="text-xs text-muted-foreground">{currentUser.title}</p>
+            <p className="text-sm font-semibold">{viewer.name}</p>
+            <p className="text-xs text-muted-foreground">{viewer.title}</p>
           </div>
-        </div>
+        </Link>
       </div>
     </div>
   );

@@ -53,8 +53,8 @@ A premium Next.js App Router SaaS scaffold for creative agencies. The product co
 |-- hooks
 |   `-- use-realtime-notifications.ts
 |-- lib
+|   |-- data.ts
 |   |-- env.ts
-|   |-- mock-data.ts
 |   |-- supabase
 |   |-- types.ts
 |   `-- utils.ts
@@ -124,6 +124,8 @@ It also includes:
 - RLS policies
 - a profile auto-create trigger from `auth.users`
 
+Before using the real-data version of the app, run the latest contents of `supabase/schema.sql` in your Supabase SQL editor so the updated policies are applied.
+
 ## Setup Guide
 
 1. Install dependencies:
@@ -157,6 +159,16 @@ It also includes:
    ```
 
 6. Open [http://localhost:3000](http://localhost:3000)
+
+## Disable Email Confirmation
+
+To allow users to sign up and immediately access the app without confirming their email first:
+
+1. Open Supabase Dashboard
+2. Go to `Authentication` -> `Settings`
+3. Disable `Email Confirmations`
+
+Supabase documents that when Email Confirmations are disabled, `signUp()` returns both a user and a session immediately.
 
 ## Free Netlify Deployment
 
@@ -207,7 +219,6 @@ If you use email auth callbacks or OAuth later, also add the matching callback U
 
 ## Production Notes
 
-- The UI ships with polished mock data so the experience looks complete before backend wiring is finished.
+- The app now reads live data from Supabase instead of local mock records.
 - Supabase clients are already abstracted in `lib/supabase`.
-- The realtime notifications hook automatically upgrades from mock data to live `notifications` inserts when env vars are set.
-- Signup flow is prepared to upload avatars into Supabase Storage and write profile rows into `public.users`.
+- Signup uploads avatars into Supabase Storage and writes profile data into `public.users`.

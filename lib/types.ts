@@ -11,8 +11,8 @@ export type UserProfile = {
   role: Role;
   avatarUrl: string;
   title: string;
-  activity: string;
-  availability: "Available" | "Focused" | "In review";
+  availability: string;
+  createdAt?: string;
 };
 
 export type ActivityItem = {
@@ -21,6 +21,7 @@ export type ActivityItem = {
   message: string;
   context: string;
   timestamp: string;
+  createdAt: string;
 };
 
 export type Client = {
@@ -33,20 +34,25 @@ export type Client = {
   linkedProjectIds: string[];
   notes: string;
   industry: string;
-  spend: string;
+  ownerId: string | null;
+  spend: number;
+  createdAt: string;
 };
 
 export type Project = {
   id: string;
   name: string;
   clientId: string;
+  clientName: string;
   description: string;
   status: ProjectStatus;
-  deadline: string;
+  deadline: string | null;
   progress: number;
-  budget: string;
+  budget: number;
   health: "Healthy" | "Watch" | "Critical";
   teamMemberIds: string[];
+  ownerId: string | null;
+  createdAt: string;
 };
 
 export type TaskComment = {
@@ -62,12 +68,15 @@ export type Task = {
   description: string;
   status: TaskStatus;
   priority: TaskPriority;
-  assigneeId: string;
-  dueDate: string;
+  assigneeId: string | null;
+  assigneeName?: string;
+  assigneeAvatarUrl?: string;
+  dueDate: string | null;
   projectId: string;
-  tags: string[];
-  comments: TaskComment[];
-  attachments: number;
+  projectName: string;
+  commentsCount: number;
+  attachmentsCount: number;
+  createdAt: string;
 };
 
 export type NotificationItem = {
@@ -77,4 +86,36 @@ export type NotificationItem = {
   kind: "mention" | "task" | "project";
   read: boolean;
   createdAt: string;
+};
+
+export type DashboardStats = {
+  activeRevenue: number;
+  activeProjects: number;
+  tasksCompleted: number;
+  teamCapacity: number;
+  atRiskProjects: number;
+};
+
+export type ThroughputPoint = {
+  label: string;
+  completed: number;
+  active: number;
+};
+
+export type FocusPoint = {
+  name: string;
+  value: number;
+};
+
+export type WorkspaceSnapshot = {
+  viewer: UserProfile;
+  users: UserProfile[];
+  clients: Client[];
+  projects: Project[];
+  tasks: Task[];
+  notifications: NotificationItem[];
+  activity: ActivityItem[];
+  stats: DashboardStats;
+  throughput: ThroughputPoint[];
+  focus: FocusPoint[];
 };
