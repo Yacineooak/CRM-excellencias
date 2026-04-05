@@ -47,7 +47,6 @@ export type Project = {
   status: ProjectStatus;
   deadline: string | null;
   progress: number;
-  budget: number;
   health: "Healthy" | "Watch" | "Critical";
   teamMemberIds: string[];
   ownerId: string | null;

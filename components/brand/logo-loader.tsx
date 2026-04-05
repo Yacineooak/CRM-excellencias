@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 
+import logoMark from "@/app/icon.png";
+
 export function LogoLoader() {
   const [visible, setVisible] = useState(true);
 
@@ -36,7 +38,7 @@ export function LogoLoader() {
                 alt="AgencyOS brand mark"
                 className="h-16 w-16 object-contain"
                 height={64}
-                src="https://i.imgur.com/pFlN7HD.png"
+                src={logoMark}
                 width={64}
               />
             </motion.div>

@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Area, AreaChart, CartesianGrid, Pie, PieChart, ResponsiveContainer, Tooltip, Cell } from "recharts";
-import { ArrowUpRight, BriefcaseBusiness, CheckCircle2, Users2 } from "lucide-react";
+import { ArrowUpRight, BriefcaseBusiness, CheckCircle2, Clock3, Users2 } from "lucide-react";
 
 import { CreateProjectForm } from "@/components/projects/create-project-form";
 import { Dialog } from "@/components/ui/dialog";
@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PageHeader } from "@/components/shared/page-header";
 import type { WorkspaceSnapshot } from "@/lib/types";
-import { formatRelativeDay } from "@/lib/utils";
+import { formatLabel, formatRelativeDay } from "@/lib/utils";
 
 const statIcons = [ArrowUpRight, BriefcaseBusiness, CheckCircle2, Users2];
 
@@ -42,6 +42,24 @@ export function DashboardWorkspace({ snapshot }: { snapshot: WorkspaceSnapshot }
       },
     ],
     [snapshot.stats],
+  );
+
+  const nextDeadlines = useMemo(
+    () =>
+      [...snapshot.tasks]
+        .filter((task) => task.dueDate && task.status !== "done")
+        .sort((left, right) => new Date(left.dueDate ?? "").getTime() - new Date(right.dueDate ?? "").getTime())
+        .slice(0, 4),
+    [snapshot.tasks],
+  );
+
+  const roleMix = useMemo(
+    () => [
+      { label: "Admins", value: snapshot.users.filter((user) => user.role === "admin").length },
+      { label: "Managers", value: snapshot.users.filter((user) => user.role === "manager").length },
+      { label: "Team members", value: snapshot.users.filter((user) => user.role === "team_member").length },
+    ],
+    [snapshot.users],
   );
 
   function exportReport() {
@@ -179,6 +197,75 @@ export function DashboardWorkspace({ snapshot }: { snapshot: WorkspaceSnapshot }
                 <span className="font-semibold">{item.value}%</span>
               </div>
             ))}
+          </div>
+        </Card>
+      </div>
+
+      <div className="grid gap-4 2xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+        <Card className="p-6">
+          <div className="mb-5 flex items-center justify-between gap-4">
+            <div>
+              <p className="text-sm text-muted-foreground">Dispatch overview</p>
+              <h3 className="mt-2 text-2xl font-semibold">Roles and workload balance</h3>
+            </div>
+            <div className="rounded-full bg-teal/12 p-3 text-teal">
+              <Users2 className="size-4" />
+            </div>
+          </div>
+          <div className="grid gap-3 md:grid-cols-3">
+            {roleMix.map((item) => (
+              <div className="rounded-[24px] border border-white/20 bg-background/40 p-4 dark:border-white/10" key={item.label}>
+                <p className="text-sm text-muted-foreground">{item.label}</p>
+                <p className="mt-3 text-3xl font-semibold">{item.value}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-5 rounded-[24px] border border-white/20 bg-background/40 p-4 dark:border-white/10">
+            <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">Team operating note</p>
+            <p className="mt-3 text-sm leading-7 text-muted-foreground">
+              This workspace is optimized around assignments, deadlines, and role-based project control for agency delivery teams.
+            </p>
+          </div>
+        </Card>
+
+        <Card className="p-6">
+          <div className="mb-5 flex items-center justify-between gap-4">
+            <div>
+              <p className="text-sm text-muted-foreground">Deadline radar</p>
+              <h3 className="mt-2 text-2xl font-semibold">What needs attention next</h3>
+            </div>
+            <div className="rounded-full bg-teal/12 p-3 text-teal">
+              <Clock3 className="size-4" />
+            </div>
+          </div>
+          <div className="space-y-3">
+            {nextDeadlines.length > 0 ? (
+              nextDeadlines.map((task) => (
+                <div className="rounded-[24px] border border-white/20 bg-background/40 p-4 dark:border-white/10" key={task.id}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="font-semibold">{task.title}</p>
+                      <p className="mt-1 text-sm text-muted-foreground">{task.projectName}</p>
+                    </div>
+                    <span className="rounded-full bg-teal/10 px-3 py-1 text-xs font-medium text-teal">
+                      {formatRelativeDay(task.dueDate ?? "")}
+                    </span>
+                  </div>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <span className="rounded-full bg-foreground/5 px-3 py-1 text-xs font-medium dark:bg-white/5">
+                      {formatLabel(task.status)}
+                    </span>
+                    <span className="rounded-full bg-foreground/5 px-3 py-1 text-xs font-medium dark:bg-white/5">
+                      {formatLabel(task.priority)}
+                    </span>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="rounded-[24px] border border-dashed border-white/20 p-4 text-sm text-muted-foreground dark:border-white/10">
+                No active deadlines yet. As tasks receive due dates, they will surface here.
+              </div>
+            )}
           </div>
         </Card>
       </div>

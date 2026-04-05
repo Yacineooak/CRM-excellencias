@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Camera } from "lucide-react";
+import { Camera, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { PageHeader } from "@/components/shared/page-header";
@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import type { ActivityItem, UserProfile } from "@/lib/types";
@@ -159,10 +160,20 @@ export function ProfileWorkspace({
             <Input onChange={(event) => setTitle(event.target.value)} value={title} />
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium">Availability</label>
-            <Input onChange={(event) => setAvailability(event.target.value)} value={availability} />
-          </div>
+          <label className="text-sm font-medium">Availability</label>
+          <Select
+            icon={<Sparkles className="size-3.5" />}
+            onChange={(event) => setAvailability(event.target.value)}
+            value={availability}
+          >
+            <option value="Available">Available</option>
+            <option value="Focused">Focused</option>
+            <option value="In review">In review</option>
+            <option value="In meetings">In meetings</option>
+            <option value="Offline">Offline</option>
+          </Select>
         </div>
+      </div>
 
         <div className="mt-4 space-y-2">
           <label className="text-sm font-medium">Working summary</label>

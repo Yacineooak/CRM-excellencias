@@ -1,8 +1,7 @@
 import Image from "next/image";
 
+import logoMark from "@/app/icon.png";
 import { cn } from "@/lib/utils";
-
-const logoUrl = "https://i.imgur.com/pFlN7HD.png";
 
 export function BrandLogo({
   className,
@@ -18,7 +17,7 @@ export function BrandLogo({
           alt="AgencyOS logo"
           className={cn("object-contain", compact ? "h-8 w-8" : "h-10 w-10")}
           height={40}
-          src={logoUrl}
+          src={logoMark}
           width={40}
         />
       </div>

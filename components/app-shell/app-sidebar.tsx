@@ -6,7 +6,7 @@ import {
   BriefcaseBusiness,
   Building2,
   LayoutDashboard,
-  Settings,
+  ListTodo,
   ShieldCheck,
   UserCircle2,
 } from "lucide-react";
@@ -14,13 +14,13 @@ import {
 import { BrandLogo } from "@/components/brand/logo";
 import { Badge } from "@/components/ui/badge";
 import type { UserProfile } from "@/lib/types";
-import { cn } from "@/lib/utils";
+import { cn, formatLabel } from "@/lib/utils";
 
 const navigation = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/clients", label: "CRM", icon: Building2 },
   { href: "/projects", label: "Projects", icon: BriefcaseBusiness },
-  { href: "/tasks", label: "Kanban", icon: Settings },
+  { href: "/tasks", label: "Kanban", icon: ListTodo },
   { href: "/admin", label: "Admin", icon: ShieldCheck, badge: "Core" },
   { href: "/profile", label: "Profile", icon: UserCircle2 },
 ];
@@ -84,7 +84,7 @@ export function AppSidebar({
       </div>
 
       <div className="mt-auto rounded-[30px] border border-white/20 bg-background/60 p-5 dark:bg-background/40">
-        <p className="text-xs uppercase tracking-[0.32em] text-muted-foreground">{viewer.role}</p>
+        <p className="text-xs uppercase tracking-[0.32em] text-muted-foreground">{formatLabel(viewer.role)}</p>
         <h3 className="mt-3 text-xl font-semibold">{taskCount} active tasks in view</h3>
         <p className="mt-2 text-sm leading-6 text-muted-foreground">
           Signed in as {viewer.name}. Your workspace now reads directly from Supabase.

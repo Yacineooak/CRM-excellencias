@@ -12,7 +12,7 @@ import {
 } from "@dnd-kit/core";
 import { SortableContext, rectSortingStrategy, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { CalendarClock, Filter, MessageSquare, Paperclip } from "lucide-react";
+import { CalendarClock, Filter, FolderKanban, MessageSquare, Paperclip, Search, UserRound } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { CreateTaskForm } from "@/components/tasks/create-task-form";
@@ -22,6 +22,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import type { Project, Task, TaskStatus, UserProfile } from "@/lib/types";
@@ -107,7 +108,7 @@ function KanbanColumn({
 
   return (
     <Card
-      className={`flex min-h-[320px] flex-col p-4 transition ${
+      className={`flex min-h-[360px] min-w-[290px] flex-col p-4 transition sm:min-w-0 ${
         isOver ? "border-teal/60 shadow-teal" : ""
       }`}
       ref={setNodeRef}
@@ -119,7 +120,15 @@ function KanbanColumn({
         </div>
         <Badge variant="muted">{count}</Badge>
       </div>
-      <div className="space-y-3">{children}</div>
+      <div className="space-y-3">
+        {count > 0 ? (
+          children
+        ) : (
+          <div className="rounded-[22px] border border-dashed border-white/20 bg-background/30 px-4 py-6 text-sm text-muted-foreground dark:border-white/10">
+            Drop a task here to move it into {title.toLowerCase()}.
+          </div>
+        )}
+      </div>
     </Card>
   );
 }
@@ -139,18 +148,23 @@ export function TasksWorkspace({
   const [items, setItems] = useState(initialTasks);
   const [isCreateOpen, setCreateOpen] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [assigneeFilter, setAssigneeFilter] = useState("all");
   const [projectFilter, setProjectFilter] = useState("all");
+  const [focusFilter, setFocusFilter] = useState<"all" | "mine" | "urgent">("all");
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
 
   const filteredItems = useMemo(
     () =>
       items.filter(
         (task) =>
+          `${task.title} ${task.description} ${task.projectName}`.toLowerCase().includes(searchQuery.toLowerCase()) &&
           (assigneeFilter === "all" || task.assigneeId === assigneeFilter) &&
-          (projectFilter === "all" || task.projectId === projectFilter),
+          (projectFilter === "all" || task.projectId === projectFilter) &&
+          (focusFilter !== "mine" || task.assigneeId === currentUserId) &&
+          (focusFilter !== "urgent" || task.priority === "urgent" || task.priority === "high"),
       ),
-    [assigneeFilter, items, projectFilter],
+    [assigneeFilter, currentUserId, focusFilter, items, projectFilter, searchQuery],
   );
 
   const grouped = useMemo(
@@ -200,6 +214,18 @@ export function TasksWorkspace({
     await updateTaskStatus(activeTask.id, nextStatus);
   }
 
+  const myTaskCount = filteredItems.filter((task) => task.assigneeId === currentUserId).length;
+  const urgentCount = filteredItems.filter(
+    (task) => task.priority === "urgent" || task.priority === "high",
+  ).length;
+  const dueSoonCount = filteredItems.filter((task) => {
+    if (!task.dueDate || task.status === "done") return false;
+    const daysUntilDue = Math.ceil(
+      (new Date(task.dueDate).getTime() - new Date().setHours(0, 0, 0, 0)) / (1000 * 60 * 60 * 24),
+    );
+    return daysUntilDue <= 3;
+  }).length;
+
   return (
     <>
       <PageHeader
@@ -218,12 +244,67 @@ export function TasksWorkspace({
         title="Beautiful task management for creative delivery"
       />
 
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_repeat(3,minmax(0,0.55fr))]">
+        <Card className="p-5">
+          <p className="text-sm text-muted-foreground">Dispatch search</p>
+          <h3 className="mt-2 text-2xl font-semibold">Find the right task instantly</h3>
+          <div className="relative mt-5">
+            <Search className="absolute left-4 top-5 size-4 text-muted-foreground" />
+            <Input
+              className="pl-10"
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Search title, project, or context"
+              value={searchQuery}
+            />
+          </div>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {[
+              { id: "all", label: "All work" },
+              { id: "mine", label: "Assigned to me" },
+              { id: "urgent", label: "High priority" },
+            ].map((option) => (
+              <button
+                className={`rounded-full px-4 py-2 text-sm transition ${
+                  focusFilter === option.id
+                    ? "bg-[linear-gradient(135deg,#4ab5b8,#2c9598)] text-white shadow-[0_14px_28px_rgba(74,181,184,0.28)]"
+                    : "bg-foreground/5 text-muted-foreground hover:bg-foreground/8 hover:text-foreground dark:bg-white/5 dark:hover:bg-white/10"
+                }`}
+                key={option.id}
+                onClick={() => setFocusFilter(option.id as "all" | "mine" | "urgent")}
+                type="button"
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </Card>
+        <Card className="p-5">
+          <p className="text-sm text-muted-foreground">Assigned to me</p>
+          <h3 className="mt-3 text-3xl font-semibold">{myTaskCount}</h3>
+          <p className="mt-2 text-sm text-muted-foreground">Live count based on the current board filters.</p>
+        </Card>
+        <Card className="p-5">
+          <p className="text-sm text-muted-foreground">Priority queue</p>
+          <h3 className="mt-3 text-3xl font-semibold">{urgentCount}</h3>
+          <p className="mt-2 text-sm text-muted-foreground">High and urgent tasks needing close attention.</p>
+        </Card>
+        <Card className="p-5">
+          <p className="text-sm text-muted-foreground">Due soon</p>
+          <h3 className="mt-3 text-3xl font-semibold">{dueSoonCount}</h3>
+          <p className="mt-2 text-sm text-muted-foreground">Tasks due within the next three days.</p>
+        </Card>
+      </div>
+
       {showFilters ? (
         <Card className="p-5">
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 lg:grid-cols-2">
             <div className="space-y-2">
               <label className="text-sm font-medium">Assignee</label>
-              <Select onChange={(event) => setAssigneeFilter(event.target.value)} value={assigneeFilter}>
+              <Select
+                icon={<UserRound className="size-3.5" />}
+                onChange={(event) => setAssigneeFilter(event.target.value)}
+                value={assigneeFilter}
+              >
                 <option value="all">All assignees</option>
                 {users.map((user) => (
                   <option key={user.id} value={user.id}>
@@ -234,7 +315,11 @@ export function TasksWorkspace({
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Project</label>
-              <Select onChange={(event) => setProjectFilter(event.target.value)} value={projectFilter}>
+              <Select
+                icon={<FolderKanban className="size-3.5" />}
+                onChange={(event) => setProjectFilter(event.target.value)}
+                value={projectFilter}
+              >
                 <option value="all">All projects</option>
                 {projects.map((project) => (
                   <option key={project.id} value={project.id}>
@@ -248,7 +333,8 @@ export function TasksWorkspace({
       ) : null}
 
       <DndContext collisionDetection={closestCorners} onDragEnd={handleDragEnd} sensors={sensors}>
-        <div className="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(280px,1fr))]">
+        <div className="overflow-x-auto pb-2">
+          <div className="flex min-w-max gap-4 xl:grid xl:min-w-0 xl:[grid-template-columns:repeat(4,minmax(0,1fr))]">
           {grouped.map((column) => (
             <KanbanColumn count={column.tasks.length} id={column.id} key={column.id} title={column.title}>
               <SortableContext items={column.tasks.map((task) => task.id)} strategy={rectSortingStrategy}>
@@ -258,6 +344,7 @@ export function TasksWorkspace({
               </SortableContext>
             </KanbanColumn>
           ))}
+          </div>
         </div>
       </DndContext>
 

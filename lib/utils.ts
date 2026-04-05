@@ -16,9 +16,12 @@ export function formatDate(input: string) {
 export function formatRelativeDay(input: string) {
   const date = new Date(input);
   const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  date.setHours(0, 0, 0, 0);
   const diff = Math.ceil((date.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 
-  if (diff <= 0) return "Today";
+  if (diff < 0) return `${Math.abs(diff)} day${Math.abs(diff) === 1 ? "" : "s"} overdue`;
+  if (diff === 0) return "Today";
   if (diff === 1) return "Tomorrow";
   if (diff < 7) return `In ${diff} days`;
   return formatDate(input);
@@ -37,4 +40,22 @@ export function formatRelativeTime(input: string) {
   if (absSeconds < 604800) return rtf.format(Math.round(diffSeconds / 86400), "day");
 
   return formatDate(input);
+}
+
+export function formatLabel(input: string) {
+  return input
+    .replaceAll("_", " ")
+    .split(" ")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+export function getInitials(input: string) {
+  return input
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part.charAt(0).toUpperCase())
+    .join("");
 }

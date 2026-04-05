@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, Search } from "lucide-react";
 
@@ -16,6 +16,13 @@ const quickActions = [
 
 export function CommandPalette() {
   const { isCommandPaletteOpen, setCommandPaletteOpen } = useUiStore();
+  const [query, setQuery] = useState("");
+
+  const filteredActions = useMemo(
+    () =>
+      quickActions.filter((action) => action.title.toLowerCase().includes(query.trim().toLowerCase())),
+    [query],
+  );
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -32,6 +39,12 @@ export function CommandPalette() {
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [isCommandPaletteOpen, setCommandPaletteOpen]);
+
+  useEffect(() => {
+    if (!isCommandPaletteOpen) {
+      setQuery("");
+    }
+  }, [isCommandPaletteOpen]);
 
   return (
     <AnimatePresence>
@@ -53,23 +66,31 @@ export function CommandPalette() {
               <Search className="size-4 text-muted-foreground" />
               <input
                 autoFocus
+                onChange={(event) => setQuery(event.target.value)}
                 className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
                 placeholder="Search clients, projects, and commands..."
+                value={query}
               />
             </div>
 
             <div className="mt-4 space-y-2">
-              {quickActions.map((action) => (
-                <Link
-                  className="flex items-center justify-between rounded-2xl px-4 py-3 text-sm transition hover:bg-foreground/5 dark:hover:bg-white/5"
-                  href={action.href}
-                  key={action.href}
-                  onClick={() => setCommandPaletteOpen(false)}
-                >
-                  <span>{action.title}</span>
-                  <ArrowRight className="size-4 text-muted-foreground" />
-                </Link>
-              ))}
+              {filteredActions.length > 0 ? (
+                filteredActions.map((action) => (
+                  <Link
+                    className="flex items-center justify-between rounded-2xl px-4 py-3 text-sm transition hover:bg-foreground/5 dark:hover:bg-white/5"
+                    href={action.href}
+                    key={action.href}
+                    onClick={() => setCommandPaletteOpen(false)}
+                  >
+                    <span>{action.title}</span>
+                    <ArrowRight className="size-4 text-muted-foreground" />
+                  </Link>
+                ))
+              ) : (
+                <div className="rounded-2xl border border-dashed border-white/20 px-4 py-6 text-sm text-muted-foreground dark:border-white/10">
+                  No matching command yet. Try dashboard, CRM, or Kanban.
+                </div>
+              )}
             </div>
           </motion.div>
         </motion.div>

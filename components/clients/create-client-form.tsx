@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { BriefcaseBusiness } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
@@ -101,7 +102,7 @@ export function CreateClientForm({
         </div>
         <div className="space-y-2">
           <label className="text-sm font-medium">Status</label>
-          <Select defaultValue="lead" name="status">
+          <Select defaultValue="lead" icon={<BriefcaseBusiness className="size-3.5" />} name="status">
             <option value="lead">Lead</option>
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>

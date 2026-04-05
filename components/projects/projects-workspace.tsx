@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { BriefcaseBusiness } from "lucide-react";
 
 import { CreateProjectForm } from "@/components/projects/create-project-form";
 import { PageHeader } from "@/components/shared/page-header";
@@ -10,8 +11,9 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
+import { Select } from "@/components/ui/select";
 import type { Client, Project, UserProfile } from "@/lib/types";
-import { formatDate } from "@/lib/utils";
+import { formatDate, formatLabel } from "@/lib/utils";
 
 export function ProjectsWorkspace({
   clients,
@@ -26,14 +28,20 @@ export function ProjectsWorkspace({
 }) {
   const [isCreateOpen, setCreateOpen] = useState(false);
   const [calendarMode, setCalendarMode] = useState(false);
+  const [statusFilter, setStatusFilter] = useState("all");
+
+  const visibleProjects = useMemo(
+    () => projects.filter((project) => statusFilter === "all" || project.status === statusFilter),
+    [projects, statusFilter],
+  );
 
   const sortedByDeadline = useMemo(
     () =>
-      [...projects].sort((left, right) =>
+      [...visibleProjects].sort((left, right) =>
         new Date(left.deadline ?? "2100-01-01").getTime() -
         new Date(right.deadline ?? "2100-01-01").getTime(),
       ),
-    [projects],
+    [visibleProjects],
   );
 
   return (
@@ -52,6 +60,32 @@ export function ProjectsWorkspace({
         eyebrow="Projects"
         title="Project delivery with visibility built in"
       />
+
+      <Card className="p-5">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="text-sm text-muted-foreground">Portfolio focus</p>
+            <h3 className="mt-2 text-2xl font-semibold">Track delivery by status and team load</h3>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 lg:w-[420px]">
+            <Select
+              icon={<BriefcaseBusiness className="size-3.5" />}
+              onChange={(event) => setStatusFilter(event.target.value)}
+              value={statusFilter}
+            >
+              <option value="all">All project statuses</option>
+              <option value="planning">Planning</option>
+              <option value="active">Active</option>
+              <option value="at_risk">At risk</option>
+              <option value="completed">Completed</option>
+            </Select>
+            <div className="rounded-[24px] border border-white/20 bg-background/45 px-4 py-3 dark:border-white/10">
+              <p className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Visible projects</p>
+              <p className="mt-2 text-lg font-semibold">{visibleProjects.length}</p>
+            </div>
+          </div>
+        </div>
+      </Card>
 
       {calendarMode ? (
         <Card className="p-6">
@@ -78,7 +112,7 @@ export function ProjectsWorkspace({
         </Card>
       ) : (
         <div className="grid gap-4 xl:grid-cols-2">
-          {projects.map((project) => {
+          {visibleProjects.map((project) => {
             const team = users.filter((user) => project.teamMemberIds.includes(user.id));
 
             return (
@@ -98,7 +132,7 @@ export function ProjectsWorkspace({
                           : "success"
                     }
                   >
-                    {project.status.replace("_", " ")}
+                    {formatLabel(project.status)}
                   </Badge>
                 </div>
 
@@ -126,6 +160,10 @@ export function ProjectsWorkspace({
                     <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">Team size</p>
                     <p className="mt-2 font-semibold">{team.length} members</p>
                   </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">Health</p>
+                    <p className="mt-2 font-semibold">{project.health}</p>
+                  </div>
                   <div className="flex -space-x-3">
                     {team.map((member) => (
                       <Avatar alt={member.name} className="size-10" key={member.id} src={member.avatarUrl} />
@@ -135,6 +173,11 @@ export function ProjectsWorkspace({
               </Card>
             );
           })}
+          {visibleProjects.length === 0 ? (
+            <div className="rounded-[28px] border border-dashed border-white/20 p-6 text-sm text-muted-foreground dark:border-white/10">
+              No projects match this filter yet.
+            </div>
+          ) : null}
         </div>
       )}
 

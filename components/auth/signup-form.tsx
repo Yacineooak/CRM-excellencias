@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
+import { ShieldCheck } from "lucide-react";
 
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -130,11 +131,14 @@ export function SignupForm() {
       </div>
       <div className="space-y-2">
         <label className="text-sm font-medium">Role</label>
-        <Select onChange={(event) => setRole(event.target.value as Role)} value={role}>
+        <Select icon={<ShieldCheck className="size-3.5" />} onChange={(event) => setRole(event.target.value as Role)} value={role}>
           <option value="admin">Admin</option>
           <option value="manager">Manager</option>
           <option value="team_member">Team Member</option>
         </Select>
+        <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
+          Roles power task dispatch, project control, and access across the workspace.
+        </p>
       </div>
       {error ? <p className="text-sm text-red-500">{error}</p> : null}
       <Button className="w-full" size="lg" type="submit">

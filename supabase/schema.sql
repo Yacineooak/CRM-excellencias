@@ -50,12 +50,13 @@ create table if not exists public.projects (
   description text,
   status public.project_status not null default 'planning',
   deadline date,
-  budget numeric(12, 2),
   progress integer not null default 0 check (progress between 0 and 100),
   owner_id uuid references public.users(id) on delete set null,
   created_at timestamptz not null default timezone('utc', now()),
   updated_at timestamptz not null default timezone('utc', now())
 );
+
+alter table if exists public.projects drop column if exists budget;
 
 create table if not exists public.project_members (
   id uuid primary key default gen_random_uuid(),

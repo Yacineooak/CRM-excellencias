@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Mail, Phone, Search } from "lucide-react";
+import { BriefcaseBusiness, Mail, Phone, Search } from "lucide-react";
 
 import { CreateClientForm } from "@/components/clients/create-client-form";
 import { PageHeader } from "@/components/shared/page-header";
@@ -10,7 +10,9 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
 import type { Client, Project } from "@/lib/types";
+import { formatLabel } from "@/lib/utils";
 
 export function ClientsWorkspace({
   clients,
@@ -22,16 +24,16 @@ export function ClientsWorkspace({
   viewerId: string;
 }) {
   const [query, setQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [isCreateOpen, setCreateOpen] = useState(false);
 
   const filteredClients = useMemo(
     () =>
       clients.filter((client) =>
-        `${client.companyName} ${client.contactName} ${client.industry}`
-          .toLowerCase()
-          .includes(query.toLowerCase()),
+        `${client.companyName} ${client.contactName} ${client.industry}`.toLowerCase().includes(query.toLowerCase()) &&
+        (statusFilter === "all" || client.status === statusFilter),
       ),
-    [clients, query],
+    [clients, query, statusFilter],
   );
 
   const featured = filteredClients[0];
@@ -107,14 +109,26 @@ export function ClientsWorkspace({
             <p className="text-sm text-muted-foreground">Client directory</p>
             <h3 className="mt-2 text-2xl font-semibold">Manage leads and active accounts</h3>
           </div>
-          <div className="relative w-full max-w-sm">
-            <Search className="absolute left-4 top-3.5 size-4 text-muted-foreground" />
-            <Input
-              className="pl-10"
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search clients"
-              value={query}
-            />
+          <div className="grid w-full gap-3 lg:max-w-2xl lg:grid-cols-[minmax(0,1fr)_240px]">
+            <div className="relative">
+              <Search className="absolute left-4 top-5 size-4 text-muted-foreground" />
+              <Input
+                className="pl-10"
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Search clients"
+                value={query}
+              />
+            </div>
+            <Select
+              icon={<BriefcaseBusiness className="size-3.5" />}
+              onChange={(event) => setStatusFilter(event.target.value)}
+              value={statusFilter}
+            >
+              <option value="all">All statuses</option>
+              <option value="lead">Lead</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </Select>
           </div>
         </div>
         <div className="mt-6 grid gap-4 xl:grid-cols-2">
@@ -150,6 +164,14 @@ export function ClientsWorkspace({
                 <div className="mt-5 flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Linked projects</span>
                   <span className="font-semibold">{client.linkedProjectIds.length}</span>
+                </div>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <span className="rounded-full bg-foreground/5 px-3 py-1 text-xs font-medium dark:bg-white/5">
+                    {formatLabel(client.status)}
+                  </span>
+                  <span className="rounded-full bg-teal/10 px-3 py-1 text-xs font-medium text-teal">
+                    {client.industry}
+                  </span>
                 </div>
               </div>
             ))

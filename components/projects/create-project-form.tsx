@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { BriefcaseBusiness, Building2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
@@ -106,7 +107,7 @@ export function CreateProjectForm({
         </div>
         <div className="space-y-2">
           <label className="text-sm font-medium">Client</label>
-          <Select name="client_id" required>
+          <Select icon={<Building2 className="size-3.5" />} name="client_id" required>
             <option value="">Select a client</option>
             {sortedClients.map((client) => (
               <option key={client.id} value={client.id}>
@@ -119,7 +120,7 @@ export function CreateProjectForm({
       <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">
           <label className="text-sm font-medium">Status</label>
-          <Select defaultValue="planning" name="status">
+          <Select defaultValue="planning" icon={<BriefcaseBusiness className="size-3.5" />} name="status">
             <option value="planning">Planning</option>
             <option value="active">Active</option>
             <option value="at_risk">At Risk</option>

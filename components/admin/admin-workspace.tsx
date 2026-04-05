@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { BriefcaseBusiness, ShieldCheck, UserRound } from "lucide-react";
 
 import { PageHeader } from "@/components/shared/page-header";
 import { Avatar } from "@/components/ui/avatar";
@@ -14,6 +15,7 @@ import { Progress } from "@/components/ui/progress";
 import { Select } from "@/components/ui/select";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import type { ActivityItem, Project, Task, UserProfile } from "@/lib/types";
+import { formatLabel } from "@/lib/utils";
 
 const tabs = ["users", "projects", "analytics"] as const;
 
@@ -34,9 +36,11 @@ export function AdminWorkspace({
   const [activeTab, setActiveTab] = useState<(typeof tabs)[number]>("users");
   const [query, setQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
+  const [projectFilter, setProjectFilter] = useState("all");
   const [isLogsOpen, setLogsOpen] = useState(false);
   const [isInviteOpen, setInviteOpen] = useState(false);
   const [signupUrl, setSignupUrl] = useState("/signup");
+  const [copied, setCopied] = useState(false);
 
   const filteredUsers = useMemo(
     () =>
@@ -46,6 +50,11 @@ export function AdminWorkspace({
           (roleFilter === "all" || user.role === roleFilter),
       ),
     [query, roleFilter, users],
+  );
+
+  const filteredProjects = useMemo(
+    () => projects.filter((project) => projectFilter === "all" || project.status === projectFilter),
+    [projectFilter, projects],
   );
 
   async function updateUserRole(userId: string, role: UserProfile["role"]) {
@@ -66,6 +75,12 @@ export function AdminWorkspace({
   useEffect(() => {
     setSignupUrl(`${window.location.origin}/signup`);
   }, []);
+
+  useEffect(() => {
+    if (isInviteOpen) {
+      setCopied(false);
+    }
+  }, [isInviteOpen]);
 
   return (
     <>
@@ -95,14 +110,14 @@ export function AdminWorkspace({
               <button
                 className={`rounded-full px-4 py-2 text-sm transition ${
                   activeTab === tab
-                    ? "bg-teal text-white shadow-teal"
-                    : "bg-foreground/5 text-muted-foreground dark:bg-white/5"
+                    ? "bg-[linear-gradient(135deg,#4ab5b8,#2c9598)] text-white shadow-[0_14px_28px_rgba(74,181,184,0.28)]"
+                    : "bg-foreground/5 text-muted-foreground hover:bg-foreground/8 hover:text-foreground dark:bg-white/5 dark:hover:bg-white/10"
                 }`}
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 type="button"
               >
-                {tab}
+                {formatLabel(tab)}
               </button>
             ))}
           </div>
@@ -112,7 +127,11 @@ export function AdminWorkspace({
           <div className="mt-6 space-y-4">
             <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_220px]">
               <Input onChange={(event) => setQuery(event.target.value)} placeholder="Search users or roles" />
-              <Select onChange={(event) => setRoleFilter(event.target.value)} value={roleFilter}>
+              <Select
+                icon={<ShieldCheck className="size-3.5" />}
+                onChange={(event) => setRoleFilter(event.target.value)}
+                value={roleFilter}
+              >
                 <option value="all">All roles</option>
                 <option value="admin">Admin</option>
                 <option value="manager">Manager</option>
@@ -135,6 +154,7 @@ export function AdminWorkspace({
                   <div className="flex flex-wrap items-center gap-3">
                     <Select
                       defaultValue={user.role}
+                      icon={<UserRound className="size-3.5" />}
                       onChange={(event) => updateUserRole(user.id, event.target.value as UserProfile["role"])}
                     >
                       <option value="admin">Admin</option>
@@ -151,12 +171,31 @@ export function AdminWorkspace({
 
         {activeTab === "projects" ? (
           <div className="mt-6 space-y-4">
-            {projects.map((project) => (
+            <div className="grid gap-3 md:grid-cols-[240px_minmax(0,1fr)]">
+              <Select
+                icon={<BriefcaseBusiness className="size-3.5" />}
+                onChange={(event) => setProjectFilter(event.target.value)}
+                value={projectFilter}
+              >
+                <option value="all">All project statuses</option>
+                <option value="planning">Planning</option>
+                <option value="active">Active</option>
+                <option value="at_risk">At risk</option>
+                <option value="completed">Completed</option>
+              </Select>
+              <div className="rounded-[24px] border border-white/20 bg-background/45 px-4 py-3 dark:border-white/10">
+                <p className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Visible portfolio</p>
+                <p className="mt-2 text-lg font-semibold">{filteredProjects.length} projects</p>
+              </div>
+            </div>
+            {filteredProjects.map((project) => (
               <div className="rounded-[24px] border border-white/20 p-4 dark:border-white/10" key={project.id}>
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div>
                     <p className="font-semibold">{project.name}</p>
-                    <p className="text-sm text-muted-foreground">{project.description}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {project.description || "No project summary yet."}
+                    </p>
                   </div>
                   <Badge variant={project.health === "Watch" ? "warning" : "success"}>
                     {project.health}
@@ -165,8 +204,21 @@ export function AdminWorkspace({
                 <div className="mt-4">
                   <Progress tone={project.health === "Watch" ? "amber" : "teal"} value={project.progress} />
                 </div>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <span className="rounded-full bg-foreground/5 px-3 py-1 text-xs font-medium dark:bg-white/5">
+                    {formatLabel(project.status)}
+                  </span>
+                  <span className="rounded-full bg-teal/10 px-3 py-1 text-xs font-medium text-teal">
+                    {project.clientName}
+                  </span>
+                </div>
               </div>
             ))}
+            {filteredProjects.length === 0 ? (
+              <div className="rounded-[24px] border border-dashed border-white/20 p-4 text-sm text-muted-foreground dark:border-white/10">
+                No projects match this admin filter.
+              </div>
+            ) : null}
           </div>
         ) : null}
 
@@ -235,11 +287,12 @@ export function AdminWorkspace({
             <Button
               onClick={async () => {
                 await navigator.clipboard.writeText(signupUrl);
+                setCopied(true);
                 setInviteOpen(false);
               }}
               type="button"
             >
-              Copy signup link
+              {copied ? "Copied" : "Copy signup link"}
             </Button>
           </div>
         </div>

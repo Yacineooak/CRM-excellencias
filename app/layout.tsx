@@ -19,9 +19,9 @@ export const metadata: Metadata = {
   title: "AgencyOS | Creative Agency Project Management",
   description: "Premium project management and team dispatch workspace for creative agencies.",
   icons: {
-    icon: "https://i.imgur.com/pFlN7HD.png",
-    shortcut: "https://i.imgur.com/pFlN7HD.png",
-    apple: "https://i.imgur.com/pFlN7HD.png",
+    icon: "/icon.png",
+    shortcut: "/icon.png",
+    apple: "/icon.png",
   },
 };
 

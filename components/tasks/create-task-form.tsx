@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { BriefcaseBusiness, Flag, ListTodo, UserRound } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -86,7 +87,7 @@ export function CreateTaskForm({
         </div>
         <div className="space-y-2">
           <label className="text-sm font-medium">Project</label>
-          <Select name="project_id" required>
+          <Select icon={<BriefcaseBusiness className="size-3.5" />} name="project_id" required>
             <option value="">Select a project</option>
             {projects.map((project) => (
               <option key={project.id} value={project.id}>
@@ -99,7 +100,7 @@ export function CreateTaskForm({
       <div className="grid gap-4 md:grid-cols-3">
         <div className="space-y-2">
           <label className="text-sm font-medium">Status</label>
-          <Select defaultValue="todo" name="status">
+          <Select defaultValue="todo" icon={<ListTodo className="size-3.5" />} name="status">
             <option value="todo">To Do</option>
             <option value="in_progress">In Progress</option>
             <option value="review">Review</option>
@@ -108,7 +109,7 @@ export function CreateTaskForm({
         </div>
         <div className="space-y-2">
           <label className="text-sm font-medium">Priority</label>
-          <Select defaultValue="medium" name="priority">
+          <Select defaultValue="medium" icon={<Flag className="size-3.5" />} name="priority">
             <option value="low">Low</option>
             <option value="medium">Medium</option>
             <option value="high">High</option>
@@ -122,7 +123,7 @@ export function CreateTaskForm({
       </div>
       <div className="space-y-2">
         <label className="text-sm font-medium">Assignee</label>
-        <Select name="assignee_id">
+        <Select icon={<UserRound className="size-3.5" />} name="assignee_id">
           <option value="">Unassigned</option>
           {users.map((user) => (
             <option key={user.id} value={user.id}>

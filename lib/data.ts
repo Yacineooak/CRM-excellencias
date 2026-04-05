@@ -47,7 +47,6 @@ type DbProject = {
   description: string | null;
   status: Project["status"];
   deadline: string | null;
-  budget: number | null;
   progress: number;
   owner_id: string | null;
   created_at: string;
@@ -278,7 +277,6 @@ export async function getWorkspaceSnapshot(): Promise<WorkspaceSnapshot | null> 
     status: project.status,
     deadline: project.deadline,
     progress: project.progress,
-    budget: Number(project.budget ?? 0),
     health: deriveProjectHealth(project),
     teamMemberIds: dbProjectMembers
       .filter((member) => member.project_id === project.id)
