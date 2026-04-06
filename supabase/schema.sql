@@ -59,10 +59,13 @@ create table if not exists public.users (
   role public.user_role not null default 'team_member',
   avatar_url text,
   title text,
+  bio text,
   activity_status text default 'Available',
   created_at timestamptz not null default timezone('utc', now()),
   updated_at timestamptz not null default timezone('utc', now())
 );
+
+alter table if exists public.users add column if not exists bio text;
 
 create table if not exists public.clients (
   id uuid primary key default gen_random_uuid(),

@@ -23,6 +23,7 @@ type DbUser = {
   role: Role;
   avatar_url: string | null;
   title: string | null;
+  bio: string | null;
   activity_status: string | null;
   created_at: string;
 };
@@ -109,6 +110,7 @@ function mapUser(row: DbUser): UserProfile {
       row.avatar_url ??
       `https://api.dicebear.com/9.x/glass/svg?seed=${encodeURIComponent(row.name ?? row.email ?? row.id)}`,
     title: row.title ?? "Team member",
+    bio: row.bio ?? "",
     availability: row.activity_status ?? "Available",
     createdAt: row.created_at,
   };
@@ -261,6 +263,7 @@ export async function getWorkspaceSnapshot(): Promise<WorkspaceSnapshot | null> 
         String(user.user_metadata.name ?? user.email ?? user.id),
       )}`,
     title: "Team member",
+    bio: "",
     availability: "Available",
   };
   const viewer = currentUserResponse.data ? mapUser(currentUserResponse.data as DbUser) : fallbackViewer;

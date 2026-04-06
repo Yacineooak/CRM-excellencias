@@ -57,10 +57,10 @@ export function AppSidebar({
           return (
             <Link
               className={cn(
-                "flex items-center justify-between rounded-[22px] px-4 py-3 text-sm transition-all duration-300",
+                "flex items-center justify-between rounded-[22px] px-4 py-3 text-sm transition-[transform,background-color,color,box-shadow] duration-100",
                 isActive
                   ? "bg-[linear-gradient(135deg,#4ab5b8,#2c9598)] text-white shadow-[0_18px_40px_rgba(74,181,184,0.3)]"
-                  : "text-muted-foreground hover:-translate-y-0.5 hover:bg-foreground/5 hover:text-foreground dark:hover:bg-white/5",
+                  : "text-muted-foreground hover:-translate-y-[1px] hover:bg-foreground/5 hover:text-foreground dark:hover:bg-white/5",
               )}
               href={item.href}
               key={item.href}
@@ -96,8 +96,8 @@ export function AppSidebar({
         </div>
         <div className="mt-4 rounded-[22px] border border-white/15 bg-background/45 px-3 py-3 dark:border-white/10">
           <p className="truncate text-sm font-semibold">{viewer.name}</p>
-          <p className="mt-1 text-xs uppercase tracking-[0.18em] text-muted-foreground">
-            Live from Supabase
+          <p className="mt-1 truncate text-xs uppercase tracking-[0.18em] text-muted-foreground">
+            {viewer.title} · {viewer.availability}
           </p>
         </div>
       </div>

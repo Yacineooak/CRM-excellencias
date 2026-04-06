@@ -19,7 +19,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
         <select
           ref={ref}
           className={cn(
-            "h-14 w-full appearance-none rounded-[24px] border border-white/45 bg-[linear-gradient(180deg,rgba(255,255,255,0.95),rgba(244,251,251,0.82))] pl-16 pr-14 text-ellipsis whitespace-nowrap text-sm font-semibold leading-none text-foreground shadow-[0_16px_34px_rgba(8,23,24,0.08)] outline-none transition duration-150 hover:-translate-y-0.5 hover:border-teal/35 hover:shadow-[0_22px_40px_rgba(74,181,184,0.16)] focus:border-teal/60 focus:ring-4 focus:ring-teal/15 dark:border-white/10 dark:bg-[linear-gradient(180deg,rgba(255,255,255,0.1),rgba(255,255,255,0.04))] dark:text-white",
+            "h-14 w-full appearance-none rounded-[24px] border border-white/45 bg-[linear-gradient(180deg,rgba(255,255,255,0.95),rgba(244,251,251,0.82))] pl-16 pr-14 text-ellipsis whitespace-nowrap text-sm font-semibold leading-none text-foreground shadow-[0_16px_34px_rgba(8,23,24,0.08)] outline-none transition-[transform,box-shadow,border-color] duration-100 hover:-translate-y-[1px] hover:border-teal/35 hover:shadow-[0_22px_40px_rgba(74,181,184,0.16)] focus:border-teal/60 focus:ring-4 focus:ring-teal/15 dark:border-white/10 dark:bg-[linear-gradient(180deg,rgba(255,255,255,0.1),rgba(255,255,255,0.04))] dark:text-white",
             className,
           )}
           {...props}

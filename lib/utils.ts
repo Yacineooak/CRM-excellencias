@@ -59,3 +59,21 @@ export function getInitials(input: string) {
     .map((part) => part.charAt(0).toUpperCase())
     .join("");
 }
+
+export function fileToDataUrl(file: File) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        resolve(reader.result);
+        return;
+      }
+
+      reject(new Error("Unable to read the selected file."));
+    };
+
+    reader.onerror = () => reject(new Error("Unable to read the selected file."));
+    reader.readAsDataURL(file);
+  });
+}

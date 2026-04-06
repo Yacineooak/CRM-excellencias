@@ -24,7 +24,7 @@ export function Topbar({
     <div className="glass-panel mesh-panel sticky top-4 z-20 mb-6 rounded-[32px] px-4 py-3">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <button
-          className="flex min-h-14 w-full items-center gap-3 rounded-[24px] border border-white/25 bg-background/65 px-4 py-3 text-sm text-muted-foreground transition hover:-translate-y-0.5 hover:border-teal/25 hover:text-foreground lg:max-w-[420px]"
+          className="flex min-h-14 w-full items-center gap-3 rounded-[24px] border border-white/25 bg-background/65 px-4 py-3 text-sm text-muted-foreground transition-[transform,border-color,color,box-shadow] duration-100 hover:-translate-y-[1px] hover:border-teal/25 hover:text-foreground lg:max-w-[420px]"
           onClick={() => setCommandPaletteOpen(true)}
           type="button"
         >
@@ -55,7 +55,7 @@ export function Topbar({
           </Button>
           <ThemeToggle />
           <Link
-            className="flex items-center gap-3 rounded-full border border-white/20 bg-background/55 px-2 py-1.5 transition hover:-translate-y-0.5 hover:bg-foreground/5 dark:border-white/10 dark:hover:bg-white/5"
+            className="flex items-center gap-3 rounded-full border border-white/20 bg-background/55 px-2 py-1.5 transition-[transform,background-color] duration-100 hover:-translate-y-[1px] hover:bg-foreground/5 dark:border-white/10 dark:hover:bg-white/5"
             href="/profile"
           >
             <Avatar alt={viewer.name} className="size-10" src={viewer.avatarUrl} />

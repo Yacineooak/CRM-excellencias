@@ -11,6 +11,7 @@ export type UserProfile = {
   role: Role;
   avatarUrl: string;
   title: string;
+  bio: string;
   availability: string;
   createdAt?: string;
 };

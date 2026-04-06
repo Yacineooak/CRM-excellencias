@@ -36,7 +36,7 @@ export function MobileDock({ taskCount }: { taskCount: number }) {
             return (
               <Link
                 className={cn(
-                  "flex flex-col items-center gap-1 rounded-[20px] px-2 py-2.5 text-[11px] font-medium transition-all",
+                  "flex flex-col items-center gap-1 rounded-[20px] px-2 py-2.5 text-[11px] font-medium transition-[transform,background-color,color,box-shadow] duration-100",
                   isActive
                     ? "bg-[linear-gradient(135deg,#4ab5b8,#2c9598)] text-white shadow-[0_14px_30px_rgba(74,181,184,0.28)]"
                     : "text-muted-foreground hover:bg-foreground/5 hover:text-foreground dark:hover:bg-white/5",

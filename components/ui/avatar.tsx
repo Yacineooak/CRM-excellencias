@@ -35,6 +35,7 @@ export function Avatar({
           onError={() => setImageError(true)}
           sizes="80px"
           src={src}
+          unoptimized
         />
       ) : (
         <div className="flex h-full w-full items-center justify-center text-sm font-semibold text-white/95">

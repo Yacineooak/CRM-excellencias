@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import type { Role } from "@/lib/types";
+import { fileToDataUrl } from "@/lib/utils";
 
 export function SignupForm() {
   const router = useRouter();
@@ -23,8 +24,8 @@ export function SignupForm() {
   const [loading, setLoading] = useState(false);
 
   const generatedAvatar = useMemo(
-    () => `https://api.dicebear.com/9.x/glass/svg?seed=${encodeURIComponent(name || "Agency User")}`,
-    [name],
+    () => `https://api.dicebear.com/9.x/glass/svg?seed=${encodeURIComponent(name || email || "New User")}`,
+    [email, name],
   );
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -77,15 +78,11 @@ export function SignupForm() {
       });
 
       if (upload.error) {
-        setError(
-          `Account created, but avatar upload failed: ${upload.error.message}. Make sure the 'avatars' bucket exists and allows authenticated uploads.`,
-        );
-        setLoading(false);
-        return;
+        avatarUrl = await fileToDataUrl(file);
+      } else {
+        const publicUrl = supabase.storage.from("avatars").getPublicUrl(filePath);
+        avatarUrl = publicUrl.data.publicUrl;
       }
-
-      const publicUrl = supabase.storage.from("avatars").getPublicUrl(filePath);
-      avatarUrl = publicUrl.data.publicUrl;
     }
 
     if (data.user) {

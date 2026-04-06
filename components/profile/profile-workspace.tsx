@@ -14,7 +14,7 @@ import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import type { ActivityItem, UserProfile } from "@/lib/types";
-import { formatLabel } from "@/lib/utils";
+import { fileToDataUrl, formatLabel } from "@/lib/utils";
 
 export function ProfileWorkspace({
   activity,
@@ -27,6 +27,7 @@ export function ProfileWorkspace({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [name, setName] = useState(viewer.name);
   const [title, setTitle] = useState(viewer.title);
+  const [bio, setBio] = useState(viewer.bio);
   const [availability, setAvailability] = useState(viewer.availability);
   const [avatarUrl, setAvatarUrl] = useState(viewer.avatarUrl);
   const [file, setFile] = useState<File | null>(null);
@@ -64,15 +65,10 @@ export function ProfileWorkspace({
       });
 
       if (upload.error) {
-        setError(
-          `Avatar upload failed: ${upload.error.message}. Make sure the 'avatars' bucket exists and allows authenticated uploads.`,
-        );
-        setLoading(false);
-        return;
+        nextAvatarUrl = await fileToDataUrl(file);
+      } else {
+        nextAvatarUrl = supabase.storage.from("avatars").getPublicUrl(path).data.publicUrl;
       }
-
-      nextAvatarUrl = supabase.storage.from("avatars").getPublicUrl(path).data.publicUrl;
-      setAvatarUrl(nextAvatarUrl);
     }
 
     const { error: updateError } = await supabase
@@ -80,6 +76,7 @@ export function ProfileWorkspace({
       .update({
         name,
         title,
+        bio,
         activity_status: availability,
         avatar_url: nextAvatarUrl,
       })
@@ -99,9 +96,10 @@ export function ProfileWorkspace({
       metadata: { title: name },
     });
 
-    router.refresh();
+    setAvatarUrl(nextAvatarUrl);
     setFile(null);
     setPreviewUrl(null);
+    router.refresh();
     setLoading(false);
   }
 
@@ -155,12 +153,18 @@ export function ProfileWorkspace({
               className="hidden"
               onChange={(event) => {
                 const nextFile = event.target.files?.[0] ?? null;
+
+                if (previewUrl) {
+                  URL.revokeObjectURL(previewUrl);
+                }
+
                 setFile(nextFile);
                 setPreviewUrl(nextFile ? URL.createObjectURL(nextFile) : null);
               }}
               type="file"
             />
           </div>
+
           <div className="space-y-2">
             <div className="flex items-center gap-3">
               <h3 className="text-2xl font-semibold">{name}</h3>
@@ -191,26 +195,27 @@ export function ProfileWorkspace({
             <Input onChange={(event) => setTitle(event.target.value)} value={title} />
           </div>
           <div className="space-y-2">
-          <label className="text-sm font-medium">Availability</label>
-          <Select
-            icon={<Sparkles className="size-3.5" />}
-            onChange={(event) => setAvailability(event.target.value)}
-            value={availability}
-          >
-            <option value="Available">Available</option>
-            <option value="Focused">Focused</option>
-            <option value="In review">In review</option>
-            <option value="In meetings">In meetings</option>
-            <option value="Offline">Offline</option>
-          </Select>
+            <label className="text-sm font-medium">Availability</label>
+            <Select
+              icon={<Sparkles className="size-3.5" />}
+              onChange={(event) => setAvailability(event.target.value)}
+              value={availability}
+            >
+              <option value="Available">Available</option>
+              <option value="Focused">Focused</option>
+              <option value="In review">In review</option>
+              <option value="In meetings">In meetings</option>
+              <option value="Offline">Offline</option>
+            </Select>
+          </div>
         </div>
-      </div>
 
         <div className="mt-4 space-y-2">
-          <label className="text-sm font-medium">Working summary</label>
+          <label className="text-sm font-medium">Profile summary</label>
           <Textarea
-            disabled
-            value="Activity history below is now sourced from Supabase activity logs instead of local mock data."
+            onChange={(event) => setBio(event.target.value)}
+            placeholder="Describe your specialty, role focus, and how teammates should work with you."
+            value={bio}
           />
         </div>
 
